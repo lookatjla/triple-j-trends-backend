@@ -23,10 +23,7 @@ public class PolygonApi implements StockApi {
     @Override
     public BigDecimal getCurrentStockPrice(String ticker) {
         try {
-            String apiUrl = String.format(
-                    "%sv2/last/trade/%s?apiKey=%s",
-                    BASE_URL, ticker, API_KEY
-            );
+            String apiUrl = String.format("%sv2/last/trade/%s?apiKey=%s", BASE_URL, ticker, API_KEY);
             HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
             connection.setRequestMethod("GET");
 
@@ -58,12 +55,10 @@ public class PolygonApi implements StockApi {
     }
 
     @Override
-    public String getSector(String ticker) {
+    public List<String> searchStockSymbols(String query) {
+        List<String> symbols = new ArrayList<>();
         try {
-            String apiUrl = String.format(
-                    "%sv3/reference/tickers?ticker=%s&apiKey=%s",
-                    BASE_URL, ticker, API_KEY
-            );
+            String apiUrl = String.format("%sv3/reference/tickers?search=%s&active=true&apiKey=%s", BASE_URL, query, API_KEY);
             HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
             connection.setRequestMethod("GET");
 
@@ -77,59 +72,23 @@ public class PolygonApi implements StockApi {
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(response.toString());
-            JsonNode resultsNode = rootNode.path("results").get(0);
-            String sector = resultsNode.path("sic_description").asText();
+            JsonNode resultsNode = rootNode.path("results");
 
-            return sector.isEmpty() ? "Unknown" : sector;
+            for (JsonNode result : resultsNode) {
+                String symbol = result.path("ticker").asText();
+                symbols.add(symbol);
+            }
         } catch (Exception e) {
-            System.err.println("Error fetching sector information: " + e.getMessage());
             e.printStackTrace();
-            return "Unknown";
         }
+        return symbols;
     }
 
     @Override
-    public Map<String, Map<LocalDate, BigDecimal>> getCompetingStocks(String sector) {
-        Map<String, Map<LocalDate, BigDecimal>> competitors = new HashMap<>();
-        try {
-            String apiUrl = String.format(
-                    "%sv3/reference/tickers?type=CS&market=stocks&active=true&apiKey=%s",
-                    BASE_URL, API_KEY
-            );
-            HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
-            connection.setRequestMethod("GET");
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            reader.close();
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(response.toString());
-            for (JsonNode tickerNode : rootNode.path("results")) {
-                String competitorTicker = tickerNode.path("ticker").asText();
-                String competitorSector = tickerNode.path("sic_description").asText();
-                if (sector.equalsIgnoreCase(competitorSector) && !competitorTicker.equalsIgnoreCase("POET")) {
-                    Map<LocalDate, BigDecimal> closingPrices = getDailyClosingPrices(competitorTicker);
-                    competitors.put(competitorTicker, closingPrices);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return competitors;
-    }
-
     public List<String> getStockNews(String ticker) {
         List<String> newsArticles = new ArrayList<>();
         try {
-            String apiUrl = String.format(
-                    "%sv2/reference/news?ticker=%s&limit=5&apiKey=%s",
-                    BASE_URL, ticker, API_KEY
-            );
+            String apiUrl = String.format("%sv2/reference/news?ticker=%s&limit=5&apiKey=%s", BASE_URL, ticker, API_KEY);
             HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
             connection.setRequestMethod("GET");
 
@@ -149,7 +108,6 @@ public class PolygonApi implements StockApi {
                 newsArticles.add(title + " - " + url);
             }
         } catch (Exception e) {
-            System.err.println("Error fetching news: " + e.getMessage());
             e.printStackTrace();
         }
         return newsArticles;
@@ -161,10 +119,7 @@ public class PolygonApi implements StockApi {
             LocalDate endDate = LocalDate.now();
             LocalDate startDate = endDate.minusWeeks(2);
 
-            String apiUrl = String.format(
-                    "%sv2/aggs/ticker/%s/range/1/day/%s/%s?adjusted=true&sort=asc&apiKey=%s",
-                    BASE_URL, ticker, startDate, endDate, API_KEY
-            );
+            String apiUrl = String.format("%sv2/aggs/ticker/%s/range/1/day/%s/%s?adjusted=true&sort=asc&apiKey=%s", BASE_URL, ticker, startDate, endDate, API_KEY);
             HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
             connection.setRequestMethod("GET");
 

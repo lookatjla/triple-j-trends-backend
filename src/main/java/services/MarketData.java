@@ -1,10 +1,10 @@
-
 package services;
 
 import api.StockApi;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 public class MarketData {
@@ -12,6 +12,10 @@ public class MarketData {
 
     public MarketData() {
         this.stockApi = StockApi.getApiImplementation();
+    }
+
+    public BigDecimal getCurrentStockPrice(String ticker) {
+        return stockApi.getCurrentStockPrice(ticker);
     }
 
     public Map<LocalDate, BigDecimal> getDailyClosingPrices(String ticker) {
@@ -22,18 +26,11 @@ public class MarketData {
         return stockApi.getDailyOpeningPrices(ticker);
     }
 
-    public BigDecimal getCurrentStockPrice(String ticker) {
-        return stockApi.getCurrentStockPrice(ticker);
+    public List<String> searchStockSymbols(String query) {
+        return stockApi.searchStockSymbols(query);
     }
 
-    public String getSector(String ticker) {
-        // Fetch the stock's sector using the API
-        return stockApi.getSector(ticker);
-    }
-
-    public Map<String, Map<LocalDate, BigDecimal>> getCompetingStocks(String sector) {
-        // Fetch competing stocks in the same sector
-        return stockApi.getCompetingStocks(sector);
+    public List<String> getStockNews(String ticker) {
+        return stockApi.getStockNews(ticker);
     }
 }
-

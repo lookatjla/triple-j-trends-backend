@@ -23,12 +23,8 @@ public class Main {
             return;
         }
 
-        // Fetch sector and competing stocks
-        String sector = marketData.getSector(ticker);
-        Map<String, Map<LocalDate, BigDecimal>> competingStocks = marketData.getCompetingStocks(sector);
-
         // Analyze and display stock data
-        StockAnalyzer analyzer = new StockAnalyzer(ticker, openingPrices, closingPrices, sector, competingStocks);
+        StockAnalyzer analyzer = new StockAnalyzer(ticker, openingPrices, closingPrices);
         analyzer.printAnalysisSummary(startDate, endDate);
     }
 }

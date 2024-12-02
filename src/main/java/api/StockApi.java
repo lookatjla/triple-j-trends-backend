@@ -1,26 +1,22 @@
-
 package api;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
+
 public interface StockApi {
-    Map<LocalDate, BigDecimal> getDailyClosingPrices(String ticker);
-    Map<LocalDate, BigDecimal> getDailyOpeningPrices(String ticker);
     BigDecimal getCurrentStockPrice(String ticker);
 
+    Map<LocalDate, BigDecimal> getDailyClosingPrices(String ticker);
+
+    Map<LocalDate, BigDecimal> getDailyOpeningPrices(String ticker);
+
+    List<String> searchStockSymbols(String query);
+
+    List<String> getStockNews(String ticker);
+
     static StockApi getApiImplementation() {
-        String selectedApi = System.getProperty("api.provider", "Polygon").toUpperCase();
-        if ("ALPHA".equals(selectedApi)) {
-            return new AlphaVantageApi();
-        } else {
-            return new PolygonApi(); // Default to Yahoo Finance
-        }
+        return new PolygonApi();
     }
-
-    String getSector(String ticker);
-
-    Map<String, Map<LocalDate, BigDecimal>> getCompetingStocks(String sector);
 }
-
-

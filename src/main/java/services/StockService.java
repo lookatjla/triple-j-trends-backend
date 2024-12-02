@@ -1,9 +1,8 @@
-
 package services;
-
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 public class StockService {
@@ -11,6 +10,10 @@ public class StockService {
 
     public StockService() {
         this.marketData = new MarketData();
+    }
+
+    public BigDecimal getCurrentStockPrice(String ticker) {
+        return marketData.getCurrentStockPrice(ticker);
     }
 
     public Map<LocalDate, BigDecimal> getDailyClosingPrices(String ticker) {
@@ -21,8 +24,11 @@ public class StockService {
         return marketData.getDailyOpeningPrices(ticker);
     }
 
-    public BigDecimal getCurrentStockPrice(String ticker) {
-        return marketData.getCurrentStockPrice(ticker);
+    public List<String> searchStockSymbols(String query) {
+        return marketData.searchStockSymbols(query);
+    }
+
+    public List<String> getStockNews(String ticker) {
+        return marketData.getStockNews(ticker);
     }
 }
-
