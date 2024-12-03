@@ -53,7 +53,7 @@ public class StockAnalyzer {
     }
 
     // Helper to calculate percentage change
-    private BigDecimal calculatePercentageChange() {
+    public BigDecimal calculatePercentageChange() {
         LocalDate startDate = dailyClosingPrices.keySet().stream().findFirst().orElse(null);
         LocalDate endDate = dailyClosingPrices.keySet().stream().reduce((first, second) -> second).orElse(null);
 
@@ -70,7 +70,7 @@ public class StockAnalyzer {
     }
 
     // Generate recommendation
-    private String generateRecommendation() {
+    public String generateRecommendation() {
         BigDecimal percentageChange = calculatePercentageChange();
 
         if (percentageChange.compareTo(BigDecimal.valueOf(5)) > 0) {
